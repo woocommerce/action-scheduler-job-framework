@@ -38,4 +38,11 @@ interface JobInterface {
 	 */
 	public function get_group_name(): string;
 
+	/**
+	 * Check if this job is running.
+	 *
+	 * @return bool
+	 */
+	public function is_running(): bool;
+
 }
