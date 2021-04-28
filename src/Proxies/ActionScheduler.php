@@ -56,7 +56,7 @@ class ActionScheduler implements ActionSchedulerInterface {
 	 *
 	 * @param string $hook
 	 * @param array  $args
-	 * @param string $group The group to check for jobs. Defaults to 'automatewoo'.
+	 * @param string $group The group to check for jobs.
 	 *
 	 * @return int|bool The timestamp for the next occurrence of a pending scheduled action, true for an async or in-progress action or false if there is no matching action.
 	 */
@@ -69,7 +69,7 @@ class ActionScheduler implements ActionSchedulerInterface {
 	 *
 	 * @param array  $args          See as_get_scheduled_actions() for possible arguments.
 	 * @param string $return_format OBJECT, ARRAY_A, or ids.
-	 * @param string $group         The group to search for jobs. Defaults to 'automatewoo'.
+	 * @param string $group         The group to search for jobs.
 	 *
 	 * @return array
 	 */
@@ -86,7 +86,7 @@ class ActionScheduler implements ActionSchedulerInterface {
 	 *
 	 * @param string $hook  The hook that the job will trigger.
 	 * @param array  $args  Args that would have been passed to the job.
-	 * @param string $group The group the job is assigned to. Defaults to 'automatewoo'.
+	 * @param string $group The group the job is assigned to.
 	 *
 	 * @return string|null The scheduled action ID if a scheduled action was found, or null if no matching action found.
 	 */
