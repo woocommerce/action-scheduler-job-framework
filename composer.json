@@ -7,6 +7,14 @@
     "require": {
         "php": ">=7.0"
     },
+    "require-dev": {
+        "woocommerce/woocommerce-sniffs": "0.1.0"
+    },
+    "scripts": {
+        "phpcs": [
+            "phpcs -s -p"
+        ]
+    },
     "autoload": {
         "psr-4": {
             "Automattic\\WooCommerce\\ActionSchedulerJobFramework\\": "src/"
