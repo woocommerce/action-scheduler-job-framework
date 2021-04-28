@@ -1,0 +1,10 @@
+{
+    "name": "woocommerce/action-scheduler-job-framework",
+    "description": "A job framework for Action Scheduler (actionscheduler.org)",
+    "type": "library",
+    "license": "GNU",
+    "minimum-stability": "stable",
+    "require": {
+        "php": ">=7.0"
+    }
+}
