@@ -1,0 +1,152 @@
+<?php
+declare( strict_types=1 );
+
+namespace Automattic\WooCommerce\ActionSchedulerJobFramework;
+
+use Exception;
+
+defined( 'ABSPATH' ) || exit;
+
+/**
+ * Class AbstractChainedJob.
+ *
+ * A "chained job" is a kind of batched job that creates follow-up actions until all items in the job have been processed.
+ *
+ * @since 1.0.0
+ */
+abstract class AbstractChainedJob extends AbstractJob implements ChainedJobInterface {
+
+	/**
+	 * Get a set of items for the batch.
+	 *
+	 * NOTE: when using an OFFSET based query to retrieve items it's recommended to order by the item ID while
+	 * ASCENDING. This is so that any newly added items will not disrupt the query offset.
+	 *
+	 * @param int   $batch_number The batch number increments for each new batch in the job cycle.
+	 * @param array $args         The args for the job.
+	 *
+	 * @throws Exception On error. The failure will be logged by Action Scheduler and the job chain will stop.
+	 */
+	abstract protected function get_items_for_batch( int $batch_number, array $args ): array;
+
+	/**
+	 * Process a single item.
+	 *
+	 * @param string|int|array $item A single item from the get_items_for_batch() method.
+	 * @param array            $args The args for the job.
+	 *
+	 * @throws Exception On error. The failure will be logged by Action Scheduler and the job chain will stop.
+	 */
+	abstract protected function process_item( $item, array $args );
+
+	/**
+	 * Init the job, register necessary WP actions.
+	 */
+	public function init() {
+		add_action( $this->get_action_full_name( self::CHAIN_START ), [ $this, 'handle_start_action' ] );
+		add_action( $this->get_action_full_name( self::CHAIN_BATCH ), [ $this, 'handle_batch_action' ], 10, 2 );
+		add_action( $this->get_action_full_name( self::CHAIN_END ), [ $this, 'handle_end_action' ] );
+	}
+
+	/**
+	 * Queue the job to be started in the background.
+	 *
+	 * @param array $args The args for the job.
+	 */
+	public function queue_start( array $args = [] ) {
+		$this->schedule_immediate_action( self::CHAIN_START, [ $args ] );
+	}
+
+	/**
+	 * Queue a batch to be processed immediately.
+	 *
+	 * @param int   $batch_number The batch number for the new batch.
+	 * @param array $args         The args for the job.
+	 */
+	protected function queue_batch( int $batch_number, array $args ) {
+		$this->schedule_immediate_action( self::CHAIN_BATCH, [ $batch_number, $args ] );
+	}
+
+	/**
+	 * Queue the job to be ended.
+	 *
+	 * Should be called once all items are processed.
+	 *
+	 * @param array $args The args for the job.
+	 */
+	protected function queue_end( array $args = [] ) {
+		$this->schedule_immediate_action( self::CHAIN_END, [ $args ] );
+	}
+
+	/**
+	 * Handles job start action.
+	 *
+	 * @hooked {plugin_name}/jobs/{job_name}/chain_start
+	 *
+	 * @param array $args The args for the job.
+	 *
+	 * @throws Exception On error. The failure will be logged by Action Scheduler and the job chain will stop.
+	 */
+	public function handle_start_action( array $args ) {
+		$this->queue_batch( 1, $args );
+	}
+
+	/**
+	 * Handle processing a chain batch.
+	 *
+	 * @hooked {plugin_name}/jobs/{job_name}/chain_batch
+	 *
+	 * @param int   $batch_number The batch number for the new batch.
+	 * @param array $args         The args for the job.
+	 *
+	 * @throws Exception On error. The failure will be logged by Action Scheduler and the job chain will stop.
+	 */
+	public function handle_batch_action( int $batch_number, array $args ) {
+		$items = $this->get_items_for_batch( $batch_number, $args );
+
+		if ( empty( $items ) ) {
+			// No more items to process so end the job chain
+			$this->queue_end( $args );
+		} else {
+			foreach ( $items as $item ) {
+				$this->process_item( $item, $args );
+			}
+
+			// If there were items, queue another batch.
+			$this->queue_batch( $batch_number + 1, $args );
+		}
+	}
+
+	/**
+	 * Handles job end action.
+	 *
+	 * @hooked {plugin_name}/jobs/{job_name}/chain_end
+	 *
+	 * @param array $args The args for the job.
+	 *
+	 * @throws Exception On error. The failure will be logged by Action Scheduler.
+	 */
+	public function handle_end_action( array $args ) {
+		// Optionally override this method in child class.
+	}
+
+	/**
+	 * Check if this job is running.
+	 *
+	 * @return bool
+	 */
+	public function is_running(): bool {
+		$start_action = $this->get_action_full_name( self::CHAIN_START );
+		$batch_action = $this->get_action_full_name( self::CHAIN_BATCH );
+
+		if ( $this->action_scheduler->next_scheduled_action( $start_action, null, $this->get_group_name() ) ) {
+			return true;
+		}
+		if ( $this->action_scheduler->next_scheduled_action( $batch_action, null, $this->get_group_name() ) ) {
+			return true;
+		}
+
+		return false;
+	}
+
+}

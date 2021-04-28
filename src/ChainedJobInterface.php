@@ -16,6 +16,10 @@ defined( 'ABSPATH' ) || exit;
  */
 interface ChainedJobInterface extends JobInterface {
 
+	const CHAIN_START = 'chain_start';
+	const CHAIN_BATCH = 'chain_batch';
+	const CHAIN_END   = 'chain_end';
+
 	/**
 	 * Queue the job to be started in the background.
 	 *
@@ -26,34 +30,35 @@ interface ChainedJobInterface extends JobInterface {
 	/**
 	 * Handles job start action.
 	 *
-	 * @hooked {plugin_name}/jobs/{job_name}/start_chain
+	 * @hooked {plugin_name}/jobs/{job_name}/chain_start
 	 *
 	 * @param array $args The args for the job.
 	 *
 	 * @throws Exception If an error occurs. Exceptions will be logged by Action Scheduler.
 	 */
-	public function handle_start( array $args );
+	public function handle_start_action( array $args );
 
 	/**
-	 * Handles process item action.
+	 * Handles job process batch action.
 	 *
-	 * @hooked {plugin_name}/jobs/{job_name}/process_item
+	 * @hooked {plugin_name}/jobs/{job_name}/chain_batch
 	 *
+	 * @param int   $batch_number The batch number for the new batch.
 	 * @param array $args The args for the job.
 	 *
 	 * @throws Exception If an error occurs. Exceptions will be logged by Action Scheduler.
 	 */
-	public function handle_item( array $args );
+	public function handle_batch_action( int $batch_number, array $args );
 
 	/**
 	 * Handles job end action.
 	 *
-	 * @hooked {plugin_name}/jobs/{job_name}/end_chain
+	 * @hooked {plugin_name}/jobs/{job_name}/chain_end
 	 *
 	 * @param array $args The args for the job.
 	 *
 	 * @throws Exception If an error occurs. Exceptions will be logged by Action Scheduler.
 	 */
-	public function handle_end( array $args );
+	public function handle_end_action( array $args );
 
 }
