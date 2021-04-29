@@ -7,6 +7,16 @@ A "chained job" is a kind of batched job that creates follow-up actions in a cha
 
 Each "batch" in the job is a separate "scheduled action". Each batch is numbered and should be limited to process a set number of items.
 
+### Methods
+
+- `::handle_start()` - Runs before a job instance starts.
+- `::handle_end()` - Runs after a job instance ends.
+- `::get_items_for_batch()` - Gets a set of items for the batch to process.
+- `::process_item()` - Processes a single item.
+- `::get_name()` - Get the unique name/ID of the job.
+- `::get_number_of_items_processed()` - Get the number of items that have been processed by the currently running instance of the job.
+- `::is_running()` - Check if this job is currently running. Checks if there is any "start" or "batch" actions `pending` or `in-progress` for the job.
+
 ### Example:
 
 ```php
