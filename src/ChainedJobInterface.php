@@ -61,4 +61,12 @@ interface ChainedJobInterface extends JobInterface {
 	 */
 	public function handle_end_action( array $args );
 
+	/**
+	 * Get the number of items processed by the currently running job.
+	 *
+	 * @return int Returns the number of items processed. Will return zero if the job isn't running.
+	 */
+	public function get_number_of_items_processed(): int;
+
+
 }

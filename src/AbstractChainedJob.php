@@ -3,6 +3,7 @@ declare( strict_types=1 );
 
 namespace Automattic\WooCommerce\ActionSchedulerJobFramework;
 
+use ActionScheduler_Action;
 use Automattic\WooCommerce\ActionSchedulerJobFramework\Utilities\BatchSize;
 use Exception;
 
@@ -178,6 +179,58 @@ abstract class AbstractChainedJob extends AbstractJob implements ChainedJobInter
 		}
 
 		return false;
+	}
+
+	/**
+	 * Get the number of items processed by the currently running job.
+	 *
+	 * @return int Returns the number of items processed. Will return zero if the job isn't running.
+	 */
+	public function get_number_of_items_processed(): int {
+		$batch_action_name = $this->get_action_full_name( self::CHAIN_BATCH );
+
+		$in_progress_actions = $this->action_scheduler->search(
+			[
+				'hook'     => $batch_action_name,
+				'per_page' => 1,
+				'status'   => $this->action_scheduler::STATUS_RUNNING,
+			]
+		);
+
+		if ( $in_progress_actions ) {
+			return $this->calculate_items_processed_from_batch_action( current( $in_progress_actions ) );
+		}
+
+		$pending_actions = $this->action_scheduler->search(
+			[
+				'hook'     => $batch_action_name,
+				'per_page' => 1,
+				'status'   => $this->action_scheduler::STATUS_PENDING,
+			]
+		);
+
+		if ( $pending_actions ) {
+			return $this->calculate_items_processed_from_batch_action( current( $pending_actions ) );
+		}
+
+		return 0;
+	}
+
+	/**
+	 * Calculate the number of items processed by the job based on a given scheduled batch action.
+	 *
+	 * @param ActionScheduler_Action $action The most recent batch action.
+	 *
+	 * @return int
+	 */
+	protected function calculate_items_processed_from_batch_action( ActionScheduler_Action $action ): int {
+		$args = $action->get_args();
+
+		// The batch number is the first action arg, take 1 because it's not been fully processed yet
+		$number_of_batches_processed = $args[0] - 1;
+
+		// Use max() to not allow a negative value
+		return max( 0, $this->get_batch_size() * $number_of_batches_processed );
 	}
 
 }
