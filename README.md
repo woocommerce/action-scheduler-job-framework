@@ -1,5 +1,8 @@
 # Action Scheduler Job Framework
 
+## Requirements
+
+- PHP 7.0+
 
 ## Chained Jobs
 
