@@ -16,6 +16,8 @@ defined( 'ABSPATH' ) || exit;
  * Each "batch" in the job is a separate "scheduled action". Each batch is numbered and should be limited to process a
  * set number of items.
  *
+ * Only a single chained job can run at any one time.
+ *
  * @since 1.0.0
  */
 abstract class AbstractChainedJob extends AbstractJob implements ChainedJobInterface {
@@ -108,6 +110,12 @@ abstract class AbstractChainedJob extends AbstractJob implements ChainedJobInter
 	 * @throws Exception On error. The failure will be logged by Action Scheduler and the job chain will stop.
 	 */
 	public function handle_start_action( array $args ) {
+		// Prevent starting if a job already has scheduled batch actions
+		$batch_action_name = $this->get_action_full_name( self::CHAIN_BATCH );
+		if ( $this->action_scheduler->next_scheduled_action( $batch_action_name, null, $this->get_group_name() ) ) {
+			throw new Exception( 'This job is already running.' );
+		}
+
 		$this->handle_start();
 		$this->queue_batch( 1, $args );
 	}
@@ -153,6 +161,8 @@ abstract class AbstractChainedJob extends AbstractJob implements ChainedJobInter
 
 	/**
 	 * Check if this job is running.
+	 *
+	 * Checks if there is any "start" or "batch" actions pending or in-progress for this job.
 	 *
 	 * @return bool
 	 */
