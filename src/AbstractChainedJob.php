@@ -13,6 +13,9 @@ defined( 'ABSPATH' ) || exit;
  *
  * A "chained job" is a kind of batched job that creates follow-up actions until all items in the job have been processed.
  *
+ * Each "batch" in the job is a separate "scheduled action". Each batch is numbered and should be limited to process a
+ * set number of items.
+ *
  * @since 1.0.0
  */
 abstract class AbstractChainedJob extends AbstractJob implements ChainedJobInterface {

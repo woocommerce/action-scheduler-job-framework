@@ -10,7 +10,7 @@ defined( 'ABSPATH' ) || exit;
 /**
  * Interface ChainedJobInterface.
  *
- * A "chained job" is a kind of batched job that creates follow-up actions until all items in the job have been processed.
+ * @see AbstractChainedJob
  *
  * @since 1.0.0
  */
