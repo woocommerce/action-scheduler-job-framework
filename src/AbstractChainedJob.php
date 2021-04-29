@@ -40,6 +40,20 @@ abstract class AbstractChainedJob extends AbstractJob implements ChainedJobInter
 	abstract protected function process_item( $item, array $args );
 
 	/**
+	 * Called before starting the job.
+	 */
+	protected function handle_start() {
+		// Optionally override this method in child class.
+	}
+
+	/**
+	 * Called after the finishing the job.
+	 */
+	protected function handle_end() {
+		// Optionally override this method in child class.
+	}
+
+	/**
 	 * Init the job, register necessary WP actions.
 	 */
 	public function init() {
@@ -88,6 +102,7 @@ abstract class AbstractChainedJob extends AbstractJob implements ChainedJobInter
 	 * @throws Exception On error. The failure will be logged by Action Scheduler and the job chain will stop.
 	 */
 	public function handle_start_action( array $args ) {
+		$this->handle_start();
 		$this->queue_batch( 1, $args );
 	}
 
@@ -127,7 +142,7 @@ abstract class AbstractChainedJob extends AbstractJob implements ChainedJobInter
 	 * @throws Exception On error. The failure will be logged by Action Scheduler.
 	 */
 	public function handle_end_action( array $args ) {
-		// Optionally override this method in child class.
+		$this->handle_end();
 	}
 
 	/**
