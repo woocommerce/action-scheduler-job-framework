@@ -3,6 +3,7 @@ declare( strict_types=1 );
 
 namespace Automattic\WooCommerce\ActionSchedulerJobFramework;
 
+use Automattic\WooCommerce\ActionSchedulerJobFramework\Utilities\BatchSize;
 use Exception;
 
 defined( 'ABSPATH' ) || exit;
@@ -15,6 +16,8 @@ defined( 'ABSPATH' ) || exit;
  * @since 1.0.0
  */
 abstract class AbstractChainedJob extends AbstractJob implements ChainedJobInterface {
+
+	use BatchSize;
 
 	/**
 	 * Get a set of items for the batch.

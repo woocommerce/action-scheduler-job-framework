@@ -15,7 +15,7 @@ trait BatchSize {
 	 *
 	 * @return int
 	 */
-	protected function get_batch_size() {
+	protected function get_batch_size(): int {
 		return 10;
 	}
 
