@@ -138,6 +138,8 @@ abstract class AbstractChainedJob extends AbstractJob implements ChainedJobInter
 			// No more items to process so end the job chain
 			$this->queue_end( $args );
 		} else {
+			$items = $this->filter_items_before_processing( $items );
+
 			foreach ( $items as $item ) {
 				$this->process_item( $item, $args );
 			}
@@ -145,6 +147,19 @@ abstract class AbstractChainedJob extends AbstractJob implements ChainedJobInter
 			// If there were items, queue another batch.
 			$this->queue_batch( $batch_number + 1, $args );
 		}
+	}
+
+	/**
+	 * Filter-like function that runs before items in a batch are processed.
+	 *
+	 * This could be useful if the results from the initial batch query need to be filtered in an additional query.
+	 *
+	 * @param array $items
+	 *
+	 * @return array
+	 */
+	protected function filter_items_before_processing( array $items ): array {
+		return $items;
 	}
 
 	/**
