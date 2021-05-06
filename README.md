@@ -4,6 +4,27 @@
 
 - PHP 7.0+
 
+## Installation
+
+The framework should be installed via [Composer](https://getcomposer.org/). 
+
+1. Add the following to your project's `composer.json` file:
+```json
+{
+  "repositories": [
+    {
+      "type": "vcs",
+      "url": "https://github.com/woocommerce/action-scheduler-job-framework"
+    }
+  ],
+  "require": {
+    "woocommerce/action-scheduler-job-framework": "1.0.0"
+  }
+}
+```
+
+2. Then run `composer update`
+
 ## Chained Jobs
 
 A "chained job" is a kind of batched job that creates follow-up actions in a chain until a set of items has been processed.
