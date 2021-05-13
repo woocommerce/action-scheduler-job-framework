@@ -3,6 +3,7 @@
 ## Requirements
 
 - PHP 7.0+
+- WooCommerce 3.9+
 
 ## Installation
 
