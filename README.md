@@ -123,9 +123,7 @@ class GenerateProductFeed extends Automattic\WooCommerce\ActionSchedulerJobFrame
 
 
 add_action( 'init', function() {
-    $job = new GenerateProductFeed(
-        new \Automattic\WooCommerce\ActionSchedulerJobFramework\Proxies\ActionScheduler()
-    );
+    $job = new GenerateProductFeed( WC()->queue() );
     $job->init();
     
     // Start the job if it's not already running

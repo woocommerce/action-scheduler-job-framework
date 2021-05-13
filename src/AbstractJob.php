@@ -3,7 +3,7 @@ declare( strict_types=1 );
 
 namespace Automattic\WooCommerce\ActionSchedulerJobFramework;
 
-use Automattic\WooCommerce\ActionSchedulerJobFramework\Proxies\ActionSchedulerInterface;
+use WC_Queue_Interface;
 
 defined( 'ABSPATH' ) || exit;
 
@@ -17,17 +17,17 @@ defined( 'ABSPATH' ) || exit;
 abstract class AbstractJob implements JobInterface {
 
 	/**
-	 * @var ActionSchedulerInterface
+	 * @var WC_Queue_Interface
 	 */
-	protected $action_scheduler;
+	protected $queue;
 
 	/**
 	 * AbstractJob constructor.
 	 *
-	 * @param ActionSchedulerInterface $action_scheduler
+	 * @param WC_Queue_Interface $queue
 	 */
-	public function __construct( ActionSchedulerInterface $action_scheduler ) {
-		$this->action_scheduler = $action_scheduler;
+	public function __construct( WC_Queue_Interface $queue ) {
+		$this->queue = $queue;
 	}
 
 	/**
@@ -57,7 +57,7 @@ abstract class AbstractJob implements JobInterface {
 	 * @param array  $args
 	 */
 	protected function schedule_immediate_action( string $action_short_name, array $args ) {
-		$this->action_scheduler->schedule_immediate(
+		$this->queue->add(
 			$this->get_action_full_name( $action_short_name ),
 			$args,
 			$this->get_group_name()

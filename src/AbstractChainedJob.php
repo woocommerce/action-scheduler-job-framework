@@ -113,7 +113,7 @@ abstract class AbstractChainedJob extends AbstractJob implements ChainedJobInter
 	public function handle_start_action( array $args ) {
 		// Prevent starting if a job already has scheduled batch actions
 		$batch_action_name = $this->get_action_full_name( self::CHAIN_BATCH );
-		if ( $this->action_scheduler->next_scheduled_action( $batch_action_name, null, $this->get_group_name() ) ) {
+		if ( $this->queue->get_next( $batch_action_name, null, $this->get_group_name() ) ) {
 			throw new Exception( 'This job is already running.' );
 		}
 
@@ -186,10 +186,10 @@ abstract class AbstractChainedJob extends AbstractJob implements ChainedJobInter
 		$start_action = $this->get_action_full_name( self::CHAIN_START );
 		$batch_action = $this->get_action_full_name( self::CHAIN_BATCH );
 
-		if ( $this->action_scheduler->next_scheduled_action( $start_action, null, $this->get_group_name() ) ) {
+		if ( $this->queue->get_next( $start_action, null, $this->get_group_name() ) ) {
 			return true;
 		}
-		if ( $this->action_scheduler->next_scheduled_action( $batch_action, null, $this->get_group_name() ) ) {
+		if ( $this->queue->get_next( $batch_action, null, $this->get_group_name() ) ) {
 			return true;
 		}
 
@@ -204,11 +204,11 @@ abstract class AbstractChainedJob extends AbstractJob implements ChainedJobInter
 	public function get_number_of_items_processed(): int {
 		$batch_action_name = $this->get_action_full_name( self::CHAIN_BATCH );
 
-		$in_progress_actions = $this->action_scheduler->search(
+		$in_progress_actions = $this->queue->search(
 			[
 				'hook'     => $batch_action_name,
 				'per_page' => 1,
-				'status'   => $this->action_scheduler::STATUS_RUNNING,
+				'status'   => ScheduledActionStatus::RUNNING,
 			]
 		);
 
@@ -216,11 +216,11 @@ abstract class AbstractChainedJob extends AbstractJob implements ChainedJobInter
 			return $this->calculate_items_processed_from_batch_action( current( $in_progress_actions ) );
 		}
 
-		$pending_actions = $this->action_scheduler->search(
+		$pending_actions = $this->queue->search(
 			[
 				'hook'     => $batch_action_name,
 				'per_page' => 1,
-				'status'   => $this->action_scheduler::STATUS_PENDING,
+				'status'   => ScheduledActionStatus::PENDING,
 			]
 		);
 
