@@ -4,6 +4,11 @@
 
 - PHP 7.0+
 
+## Breaking changes
+
+This framework may receive breaking changes at the moment while it is only used in the [Facebook for WooCommerce](https://github.com/woocommerce/facebook-for-woocommerce) plugin.
+However, once we use it in another plugin we will need to reject all breaking changes.
+
 ## Installation
 
 The framework should be installed via [Composer](https://getcomposer.org/). 
