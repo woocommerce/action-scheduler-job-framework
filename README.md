@@ -27,7 +27,7 @@ The framework should be installed via [Composer](https://getcomposer.org/).
     }
   ],
   "require": {
-    "woocommerce/action-scheduler-job-framework": "1.0.0"
+    "woocommerce/action-scheduler-job-framework": "^2.0.0"
   }
 }
 ```
