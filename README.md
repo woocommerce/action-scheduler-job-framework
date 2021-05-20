@@ -3,6 +3,8 @@
 ## Requirements
 
 - PHP 7.0+
+- [Jetpack Autoloader](https://github.com/Automattic/jetpack-autoloader) - Required to ensure the latest version of the framework is used in case multiple plugins have it as a dependency
+
 
 ## Versioning & breaking changes
 
