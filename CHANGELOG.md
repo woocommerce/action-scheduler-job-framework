@@ -1,6 +1,6 @@
 <!-- For now we follow Gutenberg's package changelog format https://github.com/WordPress/gutenberg/tree/HEAD/packages#maintaining-changelogs. -->
 
-## 1.1.0 (2021-05-19)
+## 2.0.0 (2021-05-19)
 
 ### Breaking Changes
 
